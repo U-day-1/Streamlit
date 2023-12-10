@@ -1,0 +1,45 @@
+import streamlit as st
+import numpy as np
+from PIL import Image
+from tensorflow.keras.preprocessing import image as keras_image
+import tensorflow as tf
+
+# Load your trained model
+model = tf.keras.models.load_model('brain_tumor_InceptionNet.h5')
+
+# Define the target size
+target_size = (150, 150)
+
+# Create the Streamlit app
+st.title("Brain Tumor Classification")
+
+# Upload image through Streamlit
+uploaded_file = st.file_uploader("Choose a brain MRI scan...", type=["jpg", "jpeg", "png"])
+
+if uploaded_file is not None:
+    try:
+        # Preprocess the image
+        image = Image.open(uploaded_file)
+        image = image.resize(target_size)
+
+        # Convert the image to array using keras.preprocessing.image
+        img_array = keras_image.img_to_array(image)
+        img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+        img_array /= 255.0  # Normalize pixel values to [0, 1]
+
+        # Make prediction
+        prediction = model.predict(img_array)
+
+        # Map predictions to class labels
+        classes = ["Glioma", "Meningioma", "No Tumor Found", "Pituitary"]
+        predicted_class = classes[np.argmax(prediction)]
+
+        # Display the uploaded image
+        st.image(image, caption="Uploaded MRI Scan", use_column_width=True)
+
+        # Display the prediction
+        st.write("Prediction:", predicted_class)
+
+    except ValueError as e:
+        st.error("Error: Please upload a valid image.")
+        st.exception(e)
