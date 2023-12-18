@@ -5,7 +5,7 @@ from tensorflow.keras.preprocessing import image as keras_image
 import tensorflow as tf
 
 # Load your trained model
-model = tf.keras.models.load_model('model/brain_tumor_InceptionNet.h5')
+model = tf.keras.models.load_model('brain_tumor_InceptionNet.h5')
 
 # Define the target size
 target_size = (150, 150)
